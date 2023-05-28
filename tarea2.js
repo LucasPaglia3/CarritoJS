@@ -9,16 +9,16 @@ El código tiene errores y varias cosas para mejorar / agregar
 ​
 Ejercicios
 1) Arreglar errores existentes en el código
-    a) Al ejecutar agregarProducto 2 veces con los mismos valores debería agregar 1 solo producto con la suma de las cantidades.    COMPLETADO
-    b) Al ejecutar agregarProducto debería actualizar la lista de categorías solamente si la categoría no estaba en la lista.   COMPLETADO (Nose si lo hice de la manera correcta).
-    c) Si intento agregar un producto que no existe debería mostrar un mensaje de error.    COMPLETADO
+    a) Al ejecutar agregarProducto 2 veces con los mismos valores debería agregar 1 solo producto con la suma de las cantidades      ||      COMPLETADO
+    b) Al ejecutar agregarProducto debería actualizar la lista de categorías solamente si la categoría no estaba en la lista.      ||      COMPLETADO (Nose si lo hice de la manera correcta).
+    c) Si intento agregar un producto que no existe debería mostrar un mensaje de error.      ||      COMPLETADO
 ​
 2) Agregar la función eliminarProducto a la clase Carrito
-    a) La función eliminarProducto recibe un sku y una cantidad (debe devolver una promesa)
-    b) Si la cantidad es menor a la cantidad de ese producto en el carrito, se debe restar esa cantidad al producto
-    c) Si la cantidad es mayor o igual a la cantidad de ese producto en el carrito, se debe eliminar el producto del carrito
-    d) Si el producto no existe en el carrito, se debe mostrar un mensaje de error
-    e) La función debe retornar una promesa
+    a) La función eliminarProducto recibe un sku y una cantidad (debe devolver una promesa)      ||      COMPLETADO (falta testear)
+    b) Si la cantidad es menor a la cantidad de ese producto en el carrito, se debe restar esa cantidad al producto      ||      COMPLETADO (falta testear)
+    c) Si la cantidad es mayor o igual a la cantidad de ese producto en el carrito, se debe eliminar el producto del carrito      ||      COMPLETADO (falta testear)
+    d) Si el producto no existe en el carrito, se debe mostrar un mensaje de error      ||      COMPLETADO (falta testear)
+    e) La función debe retornar una promesa      ||      COMPLETADO (falta testear)
 ​
 3) Utilizar la función eliminarProducto utilizando .then() y .catch()
 ​
@@ -107,6 +107,31 @@ class Carrito {
             if(!categoriaEcontrada) { // Si aún no existe la categoria del producto en el carrito, agregarla.
                 this.categorias.push(producto.categoria);
             }
+        } catch(error) {
+            console.error(error);
+        }
+    }
+
+    async eliminarProducto(sku, cantidad) {
+        try {
+            // Busco el producto en la "base de datos"
+            const producto = await findProductBySku(sku);
+            const productoEnCarrito = this.productos.find(productoPorSku => productoPorSku.sku === producto.sku); // Checkear si ya existe el producto en el carrito.
+
+            return new Promise((resolve, reject) => {
+                console.log("En el carrito hay: " + productoEnCarrito.cantidad + "unidades de " + productoEnCarrito.nombre);
+
+                if(cantidad < productoEnCarrito.cantidad) { // Si la cantidad que queremos quitar es menor a la cantidad del producto que hay en el array, quitar esa cantidad.
+                    this.precioTotal -= (producto.precio * cantidad);
+                    resolve(productoEnCarrito.cantidad -= cantidad);
+                } else if(cantidad >= productoEnCarrito.cantidad) { // Si la cantidad que queremos quitar es mayor o igual a la cantidad del producto que hay en el array, eliminar el producto del array.
+                    this.precioTotal -= (producto.precio * productoEnCarrito.cantidad);
+                    const indexProducto = this.productos.indexOf(productoEnCarrito);
+                    resolve(this.productos.splice(indexProducto, 1));
+                } else if(!productoEnCarrito) { // Si no existe el producto en el carrito, mostrar error.
+                    reject("El producto: " + producto.nombre + " no existe en el carrito.");
+                }
+            });
         } catch(error) {
             console.error(error);
         }
