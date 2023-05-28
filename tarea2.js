@@ -14,11 +14,11 @@ Ejercicios
     c) Si intento agregar un producto que no existe debería mostrar un mensaje de error.      ||      COMPLETADO
 ​
 2) Agregar la función eliminarProducto a la clase Carrito
-    a) La función eliminarProducto recibe un sku y una cantidad (debe devolver una promesa)      ||      COMPLETADO (falta testear)
-    b) Si la cantidad es menor a la cantidad de ese producto en el carrito, se debe restar esa cantidad al producto      ||      COMPLETADO (falta testear)
-    c) Si la cantidad es mayor o igual a la cantidad de ese producto en el carrito, se debe eliminar el producto del carrito      ||      COMPLETADO (falta testear)
-    d) Si el producto no existe en el carrito, se debe mostrar un mensaje de error      ||      COMPLETADO (falta testear)
-    e) La función debe retornar una promesa      ||      COMPLETADO (falta testear)
+    a) La función eliminarProducto recibe un sku y una cantidad (debe devolver una promesa)      ||      COMPLETADO 
+    b) Si la cantidad es menor a la cantidad de ese producto en el carrito, se debe restar esa cantidad al producto      ||      COMPLETADO 
+    c) Si la cantidad es mayor o igual a la cantidad de ese producto en el carrito, se debe eliminar el producto del carrito      ||      COMPLETADO 
+    d) Si el producto no existe en el carrito, se debe mostrar un mensaje de error      ||      COMPLETADO 
+    e) La función debe retornar una promesa      ||      COMPLETADO 
 ​
 3) Utilizar la función eliminarProducto utilizando .then() y .catch()
 ​
@@ -97,11 +97,12 @@ class Carrito {
                 console.log("Ya existe este producto en el carrito, modificando la cantidad...");
                 productoEnCarrito.cantidad += cantidad; // Actualizamos la cantidad.
                 this.precioTotal += (producto.precio * cantidad); // Actualizamos el precio.
+                console.log("Se actualizó el carrito: " + producto.nombre + ". El precio total es de: " + this.precioTotal);
             } else { // Si no existe, creo un producto nuevo.
-                console.log("Nuevo producto agregado al carrito: " + producto.nombre);
                 const nuevoProducto = new ProductoEnCarrito(sku, producto.nombre, cantidad);
                 this.productos.push(nuevoProducto);
                 this.precioTotal += (producto.precio * cantidad);
+                console.log("Nuevo producto agregado al carrito: " + producto.nombre + ". El precio total es de: " + this.precioTotal);
             }
 
             if(!categoriaEcontrada) { // Si aún no existe la categoria del producto en el carrito, agregarla.
@@ -119,15 +120,15 @@ class Carrito {
             const productoEnCarrito = this.productos.find(productoPorSku => productoPorSku.sku === producto.sku); // Checkear si ya existe el producto en el carrito.
 
             return new Promise((resolve, reject) => {
-                console.log("En el carrito hay: " + productoEnCarrito.cantidad + "unidades de " + productoEnCarrito.nombre);
+                console.log("En el carrito hay: " + productoEnCarrito.cantidad + " unidades de " + productoEnCarrito.nombre);
 
                 if(cantidad < productoEnCarrito.cantidad) { // Si la cantidad que queremos quitar es menor a la cantidad del producto que hay en el array, quitar esa cantidad.
                     this.precioTotal -= (producto.precio * cantidad);
                     resolve(productoEnCarrito.cantidad -= cantidad);
                 } else if(cantidad >= productoEnCarrito.cantidad) { // Si la cantidad que queremos quitar es mayor o igual a la cantidad del producto que hay en el array, eliminar el producto del array.
                     this.precioTotal -= (producto.precio * productoEnCarrito.cantidad);
-                    const indexProducto = this.productos.indexOf(productoEnCarrito);
-                    resolve(this.productos.splice(indexProducto, 1));
+                    const indexProducto = this.productos.indexOf(productoEnCarrito); // Conseguimos el indice del producto que queremos borrar.
+                    resolve(this.productos.splice(indexProducto, 1)); // Eliminamos el producto del array
                 } else if(!productoEnCarrito) { // Si no existe el producto en el carrito, mostrar error.
                     reject("El producto: " + producto.nombre + " no existe en el carrito.");
                 }
@@ -175,3 +176,10 @@ carrito.agregarProducto('WE328NJ', 4);
 carrito.agregarProducto('RT324GD', 3);
 carrito.agregarProducto('RT364GD', 3);
 
+carrito.eliminarProducto('WE328NJ', 3)
+    .then(() => {
+        console.log('Se eliminó el producto, el nuevo precio total es de: ' + carrito.precioTotal);
+    })
+    .catch((error) => { 
+        console.error('No se pudo eliminar el producto', error);
+    });
